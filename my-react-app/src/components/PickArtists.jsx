@@ -49,7 +49,7 @@ const PickArtists = ({ setMoodColor }) => {
       setLoadingArtists(true);
       try {
         const response = await fetch(
-          'http://localhost:4000/artists?type=artists&time_range=long_term&limit=50',
+          `${process.env.REACT_APP_BACKEND_URL}/artists?type=artists&time_range=long_term&limit=50`,
           { method: 'GET', credentials: 'include' }
         );
 
@@ -101,7 +101,7 @@ const PickArtists = ({ setMoodColor }) => {
       });
 
       const response = await fetch(
-        `http://localhost:4000/tracks?${queryParams}`,
+        `${process.env.REACT_APP_BACKEND_URL}/tracks?${queryParams}`,
         { method: 'GET', credentials: 'include' }
       );
 
@@ -132,12 +132,15 @@ const PickArtists = ({ setMoodColor }) => {
         user_id: user.id,
       };
 
-      const response = await fetch('http://localhost:4000/create_playlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/create_playlist`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(body),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -159,7 +162,7 @@ const PickArtists = ({ setMoodColor }) => {
   const addTracksToPlaylist = async (playlistId, tracks) => {
     const trackUris = tracks.map((track) => track.uri);
     try {
-      const response = await fetch(`http://localhost:4000/add`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

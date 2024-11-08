@@ -23,10 +23,13 @@ export const PlaylistProvider = ({ children }) => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch('http://localhost:4000/user', {
-        method: 'GET',
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/user`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch user data');

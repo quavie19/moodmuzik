@@ -14,7 +14,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Replace with your frontend URL
+    origin: process.env.FRONTEND_URL, // Replace with your frontend URL
     credentials: true, // Allow cookies (session) to be included in the requests
   })
 );
@@ -33,9 +33,9 @@ app.use(
 
 // Your existing routes...
 
-const client_id = '3a53f00486b6425aa952ad4aaa63183e';
-const redirect_uri = 'http://localhost:4000/callback';
-const client_secret = 'bc620d71b0b5413985c1c0740b25268d';
+const client_id = process.env.SPOTIFY_CLIENT_ID;
+const redirect_uri = process.env.REDIRECT_URI;
+const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 
 //LOGIN AUTH
 app.get('/login', function (req, res) {
@@ -436,5 +436,4 @@ app.get('/tracks', ensureAuthenticated, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
-
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
