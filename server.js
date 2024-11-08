@@ -92,7 +92,7 @@ app.get('/callback', async (req, res) => {
     req.session.refresh_token = refresh_token;
 
     // Make sure to use return to prevent sending multiple responses
-    return res.redirect('http://localhost:5173/artists');
+    return res.redirect(`${process.env.FRONTEND_URL}/artists`);
   } catch (error) {
     console.error('Error during token exchange:', error);
 
