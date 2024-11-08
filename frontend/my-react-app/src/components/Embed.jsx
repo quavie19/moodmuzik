@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { usePlaylist } from './PlaylistContext'; // Assuming you have this hook
 
-const Embed = ({ resetAppState }) => {
+const Embed = () => {
   const { playlistId } = useParams();
   const [playlistUrl, setPlaylistUrl] = useState('');
   const navigate = useNavigate();
+  const { resetPlaylistSelections } = usePlaylist();
 
   useEffect(() => {
     if (playlistId) {
@@ -21,7 +23,7 @@ const Embed = ({ resetAppState }) => {
   };
 
   const handleCreateAnother = () => {
-    resetAppState(); // Reset all settings
+    resetPlaylistSelections(); // Reset all settings
     navigate('/'); // Navigate to home page
   };
 

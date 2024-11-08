@@ -3,13 +3,22 @@ const session = require('express-session');
 const cors = require('cors');
 const querystring = require('querystring');
 const axios = require('axios');
-// const crypto = require('crypto');
-// const secretKey = crypto.randomBytes(64).toString('hex'); // Generates a 64-byte hex string
-// console.log(secretKey);
+const path = require('path');
 const { generateRandomString } = require('../utils/utils');
-require('dotenv').config();
+
+require('dotenv').config({
+  path: '/Users/jaquavia/Desktop/playlist-generator/backend/api/.env',
+});
 
 const app = express();
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
+  });
+}
 
 // Middleware
 app.use(
@@ -436,6 +445,7 @@ app.get('/tracks', ensureAuthenticated, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
+
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
 module.exports = app;

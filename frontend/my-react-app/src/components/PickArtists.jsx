@@ -4,7 +4,9 @@ import { usePlaylist } from './PlaylistContext';
 
 const PickArtists = ({ setMoodColor }) => {
   const navigate = useNavigate();
-  const { mood, length, user, setPlaylistId } = usePlaylist();
+  const { mood, length, user, setPlaylistId, resetPlaylistSelections } =
+    usePlaylist();
+
   const [artists, setArtists] = useState([]);
   const [selectedArtists, setSelectedArtists] = useState([]);
   const [error, setError] = useState(null);
@@ -49,7 +51,7 @@ const PickArtists = ({ setMoodColor }) => {
       setLoadingArtists(true);
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/artists?type=artists&time_range=long_term&limit=50`,
+          'http://localhost:4000/artists?type=artists&time_range=long_term&limit=50',
           { method: 'GET', credentials: 'include' }
         );
 
@@ -101,7 +103,7 @@ const PickArtists = ({ setMoodColor }) => {
       });
 
       const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/tracks?${queryParams}`,
+        `http://localhost:4000/tracks?${queryParams}`,
         { method: 'GET', credentials: 'include' }
       );
 
@@ -119,6 +121,14 @@ const PickArtists = ({ setMoodColor }) => {
     }
   };
 
+  const resetSelections = () => {
+    setSelectedArtists([]);
+    setFetchedTracks([]);
+    resetPlaylistSelections();
+    setMood(null);
+    setLength(null);
+  };
+
   const createPlaylist = async (tracks) => {
     if (creationInProgress || !user?.id || tracks.length === 0) return;
 
@@ -132,15 +142,12 @@ const PickArtists = ({ setMoodColor }) => {
         user_id: user.id,
       };
 
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/create_playlist`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(body),
-        }
-      );
+      const response = await fetch('http://localhost:4000/create_playlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -162,7 +169,7 @@ const PickArtists = ({ setMoodColor }) => {
   const addTracksToPlaylist = async (playlistId, tracks) => {
     const trackUris = tracks.map((track) => track.uri);
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/add`, {
+      const response = await fetch('http://localhost:4000/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
