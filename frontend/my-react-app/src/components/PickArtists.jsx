@@ -193,6 +193,10 @@ const PickArtists = ({ setMoodColor }) => {
     }
   };
 
+  console.log(mood);
+  console.log(length);
+  console.log(selectedArtists);
+
   return (
     <section id='choose-artist'>
       <div>
