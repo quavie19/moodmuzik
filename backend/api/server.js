@@ -3,43 +3,35 @@ const session = require('express-session');
 const cors = require('cors');
 const querystring = require('querystring');
 const axios = require('axios');
-const path = require('path');
+const pool = require('./db');
+
 const { generateRandomString } = require('../utils/utils');
 
-require('dotenv').config({
-  path: '/Users/jaquavia/Desktop/playlist-generator/backend/api/.env',
-});
-
 const app = express();
-
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
-  });
-}
 
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // Replace with your frontend URL
+    origin: process.env.FRONTEND_URL || 'https://www.moodmuzik.com', // Fallback to hardcoded URL if not set
     credentials: true, // Allow cookies (session) to be included in the requests
   })
 );
+
 app.use(express.json());
+app.set('trust proxy', 1);
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET, // Replace with a strong secret key
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // true in production
+      secure: true, // true in production
       maxAge: 60 * 60 * 1000, // Session lasts for 1 hour (in milliseconds)
+      sameSite: 'none',
     },
   })
 );
-
 // Your existing routes...
 
 const client_id = process.env.SPOTIFY_CLIENT_ID;
@@ -150,6 +142,7 @@ app.get('/refresh_token', (req, res) => {
 });
 
 const ensureAuthenticated = (req, res, next) => {
+  console.log('Session data:', req.session); // Log the session data to check if the access token is present
   if (req.session.access_token) {
     return next();
   }
@@ -209,6 +202,19 @@ app.post('/delete', ensureAuthenticated, async (req, res) => {
       console.error('Error response data:', error.response.data);
     }
     res.status(500).send('An error occurred while deleting playlists');
+  }
+});
+
+app.post('signup', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const response = await pool.query(
+      'INSERT INTO user (email) VALUES ($1) RETURNING *',
+      [email]
+    );
+    res.json(email.rows[0]);
+  } catch (err) {
+    console.error(err.message);
   }
 });
 
